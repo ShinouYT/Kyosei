@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Kyosei - Restaurant App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        :root {
+            --color-primary: #7c3aed;
+            --color-primary-light: #a78bfa;
+            --color-primary-dark: #6d28d9;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-bg: #0f172a;
+            --color-surface: #1e293b;
+            --color-text: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-border: #475569;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            border-radius: 40px;
+            border: 12px solid #000;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 0 2px #333;
+            position: relative;
+            background: var(--color-bg);
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 28px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 1000;
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* SPLASH SCREEN */
+        .splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-bg) 0%, #0a0f1f 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: splashFadeOut 2s ease-in-out forwards;
+            animation-delay: 2s;
+        }
+
+        @keyframes splashFadeOut {
+            0% {
+                opacity: 1;
+                visibility: visible;
+            }
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .splash-logo {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .splash-logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            object-fit: contain;
+            animation: logoGrow 1.5s ease-out;
+        }
+
+        .loading-ring {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border: 3px solid rgba(124, 58, 237, 0.3);
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            animation: spin 2s linear;
+        }
+
+        @keyframes logoGrow {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* MAIN CONTENT */
+        .app-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .home-screen {
+            flex: 1;
+            background: linear-gradient(135deg, var(--color-bg) 0%, #0a0f1f 100%);
+            display: flex;
+            flex-direction: column;
+            padding-top: 45px;
+            padding-bottom: 0;
+        }
+
+        .restaurant-header {
+            text-align: center;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .restaurant-header h1 {
+            font-size: 1.8em;
+            color: var(--color-primary-light);
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .restaurant-header p {
+            color: var(--color-text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .restaurant-header .rating {
+            color: var(--color-warning);
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        /* NAVIGATION BUTTONS */
+        .nav-buttons {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0 20px 30px 20px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .nav-btn {
+            aspect-ratio: 1;
+            border: 2px solid var(--color-border);
+            background: rgba(124, 58, 237, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            color: var(--color-text);
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-5px);
+        }
+
+        .nav-btn:hover::before {
+            opacity: 0.15;
+        }
+
+        .nav-btn-icon {
+            font-size: 2.5em;
+            line-height: 1;
+        }
+
+        .nav-btn-label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-secondary);
+        }
+
+        .nav-btn:hover .nav-btn-label {
+            color: var(--color-primary-light);
+        }
+
+        /* LOYALTY INDICATOR */
+        .loyalty-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 280px;
+            padding: 15px 20px;
+            background: rgba(124, 58, 237, 0.15);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .loyalty-indicator:hover {
+            opacity: 1;
+            border-color: var(--color-primary);
+            background: rgba(124, 58, 237, 0.2);
+        }
+
+        .loyalty-indicator-text {
+            font-size: 0.85em;
+            color: var(--color-text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .loyalty-indicator-arrow {
+            font-size: 1.5em;
+            animation: bounceDown 2s ease-in-out infinite;
+        }
+
+        @keyframes bounceDown {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(8px);
+                opacity: 1;
+            }
+        }
+
+        /* MENU SCREEN */
+        .menu-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-bg);
+            display: flex;
+            flex-direction: column;
+            padding-top: 45px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-100%);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 100;
+        }
+
+        .menu-screen.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .screen-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .screen-header h2 {
+            font-size: 1.5em;
+            color: var(--color-primary-light);
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 20px;
+            padding-bottom: 80px;
+        }
+
+        .menu-category {
+            margin-bottom: 25px;
+        }
+
+        .menu-category h3 {
+            color: var(--color-primary-light);
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding-bottom: 12px;
+            position: relative;
+        }
+
+        .menu-category h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--color-primary), transparent);
+            border-radius: 1px;
+        }
+
+        .menu-item {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            border-color: var(--color-primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .menu-item-header {
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .menu-item-emoji {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            border-radius: 8px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+        }
+
+        .menu-item-info {
+            flex: 1;
+        }
+
+        .menu-item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.95em;
+        }
+
+        .menu-item-desc {
+            font-size: 0.8em;
+            color: var(--color-text-secondary);
+        }
+
+        .menu-item-price-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .menu-item-price {
+            font-weight: 700;
+            color: var(--color-success);
+            font-size: 1em;
+        }
+
+        .expand-arrow {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+            color: var(--color-primary-light);
+            cursor: pointer;
+        }
+
+        .menu-item.expanded .expand-arrow {
+            transform: rotate(90deg);
+        }
+
+        .menu-item-description {
+            display: none;
+            background: rgba(124, 58, 237, 0.1);
+            border-top: 1px solid rgba(124, 58, 237, 0.3);
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 0 0 8px 8px;
+            font-size: 0.85em;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        .menu-item.expanded .menu-item-description {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+
+        .cart-float {
+            position: absolute;
+            bottom: 25px;
+            right: 20px;
+            background: var(--color-primary);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+            animation: bounce 2s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* RESERVATION SCREEN */
+        .reservation-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-bg);
+            display: flex;
+            flex-direction: column;
+            padding-top: 45px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(100%);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 100;
+        }
+
+        .reservation-screen.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .reservation-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--color-text);
+            font-size: 0.95em;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            color: var(--color-text);
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.05em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(124, 58, 237, 0.4);
+        }
+
+        /* LOYALTY SCREEN */
+        .loyalty-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-bg);
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(100%);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 50;
+            padding-top: 45px;
+            overflow-y: auto;
+        }
+
+        .loyalty-screen.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .loyalty-handle {
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+            flex-shrink: 0;
+            cursor: grab;
+        }
+
+        .loyalty-handle-bar {
+            width: 40px;
+            height: 4px;
+            background: var(--color-border);
+            border-radius: 2px;
+        }
+
+        .loyalty-card {
+            width: calc(100% - 40px);
+            margin: 20px 20px;
+            padding: 25px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(124, 58, 237, 0.4);
+            animation: cardSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes cardSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .member-header {
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .member-level {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .member-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: white;
+            margin-top: 5px;
+        }
+
+        .points-display {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .points-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .points-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .barcode-container {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .barcode {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            letter-spacing: 2px;
+            color: #000;
+            font-weight: bold;
+            animation: barcodeScan 2s ease-in-out infinite;
+        }
+
+        @keyframes barcodeScan {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .card-number {
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.8em;
+            margin-top: 8px;
+        }
+
+        .loyalty-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .loyalty-content {
+            width: 100%;
+            padding: 0 20px 30px 20px;
+        }
+
+        .rewards-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .rewards-title {
+            color: var(--color-primary-light);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .reward-item:last-child {
+            border-bottom: none;
+        }
+
+        .reward-name {
+            font-size: 0.9em;
+        }
+
+        .reward-points {
+            background: rgba(124, 58, 237, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8em;
+        }
+
+        /* SCROLLBAR */
+        .menu-content::-webkit-scrollbar,
+        .reservation-content::-webkit-scrollbar,
+        .loyalty-screen::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .menu-content::-webkit-scrollbar-thumb,
+        .reservation-content::-webkit-scrollbar-thumb,
+        .loyalty-screen::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="notch"></div>
+        <div class="app-container">
+            <!-- SPLASH SCREEN -->
+            <div class="splash-screen" id="splashScreen">
+                <div class="splash-logo">
+                    <div class="loading-ring"></div>
+                    <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/72b161a7-10d6-40c3-83f6-e476a9c0ea15" alt="Kyosei">
+                </div>
+            </div>
+
+            <!-- APP CONTENT -->
+            <div class="app-content" id="appContent">
+                <!-- HOME SCREEN -->
+                <div class="home-screen" id="homeScreen">
+                    <div class="restaurant-header">
+                        <h1>🍜 Kyosei</h1>
+                        <p>Restaurant Japonais Authentique</p>
+                        <div class="rating">⭐ 4.8 (243 avis) • Rennes</div>
+                    </div>
+
+                    <div class="loyalty-indicator" onclick="openLoyalty()">
+                        <div class="loyalty-indicator-text">Carte de fidélité</div>
+                        <div class="loyalty-indicator-arrow">👇</div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <div class="button-group">
+                            <button class="nav-btn" onclick="openReservation()">
+                                <div class="nav-btn-icon">📅</div>
+                                <div class="nav-btn-label">Réserver</div>
+                            </button>
+                            <button class="nav-btn" onclick="goHome()" style="visibility: hidden; pointer-events: none;">
+                                <div class="nav-btn-icon">🏠</div>
+                                <div class="nav-btn-label">Accueil</div>
+                            </button>
+                            <button class="nav-btn" onclick="openMenu()">
+                                <div class="nav-btn-icon">🍽️</div>
+                                <div class="nav-btn-label">Menu</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU SCREEN -->
+                <div class="menu-screen" id="menuScreen">
+                    <div class="screen-header">
+                        <h2>🍽️ Menu</h2>
+                        <button class="close-btn" onclick="closeMenu()">✕</button>
+                    </div>
+                    <div class="menu-content">
+                        <div class="menu-category">
+                            <h3>Entrées</h3>
+                            <div class="menu-item" onclick="toggleDescription(this)">
+                                <div class="menu-item-header">
+                                    <div class="menu-item-emoji">🍣</div>
+                                    <div class="menu-item-info">
+                                        <div class="menu-item-name">Déclinaison des 3 Saumons</div>
+                                        <div class="menu-item-desc">Sashimi, Tartare, Mi-cuit</div>
+                                    </div>
+                                    <div class="menu-item-price-row">
+                                        <div class="menu-item-price">6€</div>
+                                        <span class="expand-arrow">➜</span>
+                                    </div>
+                                </div>
+                                <div class="menu-item-description">
+                                    🍣 <strong>Sashimi de saumon</strong> cru premium • <strong>Tartare asiatique</strong> avec sauce soja et gingembre • <strong>Mi-cuit</strong> servi tiède avec sauce betterave délicate
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-category">
+                            <h3>Plats</h3>
+                            <div class="menu-item" onclick="toggleDescription(this)">
+                                <div class="menu-item-header">
+                                    <div class="menu-item-emoji">🐟</div>
+                                    <div class="menu-item-info">
+                                        <div class="menu-item-name">Filet de Balaou</div>
+                                        <div class="menu-item-desc">Sauce meunière & Riz Furikake</div>
+                                    </div>
+                                    <div class="menu-item-price-row">
+                                        <div class="menu-item-price">13€</div>
+                                        <span class="expand-arrow">➜</span>
+                                    </div>
+                                </div>
+                                <div class="menu-item-description">
+                                    🐟 <strong>Balaou</strong> poisson blanc délicat aux saveurs marines subtiles • <strong>Sauce meunière</strong> au beurre noisette • <strong>Furikake</strong> condiment japonais sucré-salé qui sublime le riz
+                                </div>
+                            </div>
+                            <div class="menu-item" onclick="toggleDescription(this)">
+                                <div class="menu-item-header">
+                                    <div class="menu-item-emoji">🍜</div>
+                                    <div class="menu-item-info">
+                                        <div class="menu-item-name">Ramen au Gigot de 7h</div>
+                                        <div class="menu-item-desc">Cuisson lente & saveurs intenses</div>
+                                    </div>
+                                    <div class="menu-item-price-row">
+                                        <div class="menu-item-price">16€</div>
+                                        <span class="expand-arrow">➜</span>
+                                    </div>
+                                </div>
+                                <div class="menu-item-description">
+                                    🍗 <strong>Gigot de 7h</strong> cuit en basse température pendant 7 heures = viande ultra-tendre et fondante • Saveurs caramélisées concentrées • Parfait dans le bouillon riche des ramen
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-category">
+                            <h3>Desserts</h3>
+                            <p style="color: var(--color-text-secondary); font-size: 0.9em; padding: 10px;">À compléter...</p>
+                        </div>
+
+                        <div class="menu-category">
+                            <h3>Boissons</h3>
+                            <div class="menu-item" onclick="toggleDescription(this)">
+                                <div class="menu-item-header">
+                                    <div class="menu-item-emoji">🍵</div>
+                                    <div class="menu-item-info">
+                                        <div class="menu-item-name">Thé Vert Matcha</div>
+                                        <div class="menu-item-desc">Préparation traditionnelle</div>
+                                    </div>
+                                    <div class="menu-item-price-row">
+                                        <div class="menu-item-price">5€</div>
+                                        <span class="expand-arrow">➜</span>
+                                    </div>
+                                </div>
+                                <div class="menu-item-description">
+                                    🍵 <strong>Matcha premium</strong> poudre verte finement moulue • Préparée traditionnellement fouettée • Saveur légèrement amère et umami
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-category">
+                            <h3>Menu Étudiants</h3>
+                            <p style="color: var(--color-text-secondary); font-size: 0.9em; padding: 10px;">À compléter...</p>
+                        </div>
+
+                        <div class="menu-category">
+                            <h3>Menu Enfant</h3>
+                            <p style="color: var(--color-text-secondary); font-size: 0.9em; padding: 10px;">À compléter...</p>
+                        </div>
+                    </div>
+                    <div class="cart-float">
+                        🛒 <span id="cartCount">0</span> articles
+                    </div>
+                </div>
+
+                <!-- RESERVATION SCREEN -->
+                <div class="reservation-screen" id="reservationScreen">
+                    <div class="screen-header">
+                        <h2>📅 Réservation</h2>
+                        <button class="close-btn" onclick="closeReservation()">✕</button>
+                    </div>
+                    <div class="reservation-content">
+                        <form onsubmit="submitReservation(event)">
+                            <div class="form-group">
+                                <label class="form-label">Nom</label>
+                                <input type="text" class="form-input" placeholder="Votre nom" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" placeholder="votre@email.com" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" class="form-input" placeholder="06 12 34 56 78" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Date & Heure</label>
+                                <div class="input-group">
+                                    <input type="date" class="form-input" required>
+                                    <input type="time" class="form-input" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Nombre de couverts</label>
+                                <select class="form-select" required>
+                                    <option>Choisir...</option>
+                                    <option>1 personne</option>
+                                    <option>2 personnes</option>
+                                    <option>3 personnes</option>
+                                    <option>4 personnes</option>
+                                    <option>5 personnes</option>
+                                    <option>6+ personnes</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Préférences</label>
+                                <textarea class="form-input" placeholder="Allergies, demandes spéciales..." style="resize: vertical; height: 80px;"></textarea>
+                            </div>
+
+                            <button type="submit" class="submit-btn">Confirmer ✓</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- LOYALTY SCREEN -->
+                <div class="loyalty-screen" id="loyaltyScreen">
+                    <div class="loyalty-handle" onclick="closeLoyalty()">
+                        <div class="loyalty-handle-bar"></div>
+                    </div>
+
+                    <div class="loyalty-card">
+                        <div class="member-header">
+                            <div class="member-level">🏆 Membre GOLD</div>
+                            <div class="member-name">🍜 Kyosei</div>
+                        </div>
+                        <div class="points-display">
+                            <div class="points-value">850</div>
+                            <div class="points-label">Points disponibles</div>
+                        </div>
+                        <div class="barcode-container">
+                            <div class="barcode">║ ║ ║║║ ║ ║ ║║ ║║║ ║║ ║ ║║ ║ ║</div>
+                            <div class="card-number">Carte #: KYO-2024-12345</div>
+                        </div>
+                        <div class="loyalty-info">✓ Prochaine récompense: 150 points (100 points restants)</div>
+                    </div>
+
+                    <div class="loyalty-content">
+                        <div class="rewards-section">
+                            <div class="rewards-title">🎁 Récompenses Disponibles</div>
+                            <div class="reward-item">
+                                <span class="reward-name">Plat offert</span>
+                                <span class="reward-points">150 pts</span>
+                            </div>
+                            <div class="reward-item">
+                                <span class="reward-name">Apéritif gratuit</span>
+                                <span class="reward-points">100 pts</span>
+                            </div>
+                            <div class="reward-item">
+                                <span class="reward-name">Dessert spécial</span>
+                                <span class="reward-points">75 pts</span>
+                            </div>
+                        </div>
+
+                        <div class="rewards-section">
+                            <div class="rewards-title">📊 Historique Récent</div>
+                            <div class="reward-item">
+                                <span class="reward-name">+ 45 points</span>
+                                <span class="reward-points">27 jan</span>
+                            </div>
+                            <div class="reward-item">
+                                <span class="reward-name">- 100 points</span>
+                                <span class="reward-points">20 jan</span>
+                            </div>
+                            <div class="reward-item">
+                                <span class="reward-name">+ 60 points</span>
+                                <span class="reward-points">15 jan</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cartItems = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function openMenu() {
+            document.getElementById('menuScreen').classList.add('active');
+        }
+
+        function closeMenu() {
+            document.getElementById('menuScreen').classList.remove('active');
+        }
+
+        function openReservation() {
+            document.getElementById('reservationScreen').classList.add('active');
+        }
+
+        function closeReservation() {
+            document.getElementById('reservationScreen').classList.remove('active');
+        }
+
+        function openLoyalty() {
+            document.getElementById('loyaltyScreen').classList.add('active');
+        }
+
+        function closeLoyalty() {
+            document.getElementById('loyaltyScreen').classList.remove('active');
+        }
+
+        function goHome() {
+            closeMenu();
+            closeReservation();
+            closeLoyalty();
+        }
+
+        function toggleDescription(element) {
+            element.classList.toggle('expanded');
+        }
+
+        function submitReservation(event) {
+            event.preventDefault();
+            alert('✓ Réservation confirmée!\n\nVous recevrez une confirmation par email et SMS.');
+            closeReservation();
+        }
+
+        // Touch support
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+            const xDiff = touchStartX - touchEndX;
+            const yDiff = touchStartY - touchEndY;
+
+            if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
+                if (xDiff > 0) {
+                    closeMenu();
+                    closeReservation();
+                } else {
+                    closeMenu();
+                    closeReservation();
+                }
+            } else if (Math.abs(yDiff) > 50) {
+                if (yDiff > 0) {
+                    openLoyalty();
+                } else {
+                    closeLoyalty();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
